@@ -13,10 +13,6 @@
             font-family: 'Inter', sans-serif;
             background-color: #f3f4f6;
         }
-        .timer-red {
-            color: #ef4444;
-            font-weight: 700;
-        }
         .correct-answer {
             background-color: #d1fae5;
             border-color: #10b981;
@@ -46,15 +42,15 @@
     <!-- Start Screen -->
     <div id="start-screen" class="text-center transition-opacity duration-500 ease-in-out opacity-100">
         <h1 class="text-4xl font-bold mb-4 text-gray-800">Python Fundamentals Quiz</h1>
-        <p class="text-gray-600 mb-8">Test your knowledge on Python basics. The quiz has 90 questions across three sections: Multiple Choice, True/False, and Matching Type. You have 90 minutes to complete the quiz.</p>
+        <p class="text-gray-600 mb-8">Test your knowledge on Python fundamentals with 120 questions across three sections: Multiple Choice, True/False, and Matching Type.</p>
         <button id="start-btn" class="px-6 py-3 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105">Start Quiz</button>
     </div>
 
     <!-- Quiz Screen -->
     <div id="quiz-screen" class="hidden">
-        <div class="flex flex-col sm:flex-row justify-between items-center mb-6 border-b pb-4">
-            <div id="timer" class="text-lg font-medium text-gray-700">Time Left: 90:00</div>
-            <div id="progress" class="text-lg font-medium text-gray-700 mt-2 sm:mt-0">Question 1 of 90</div>
+        <div class="flex justify-between items-center mb-6 border-b pb-4">
+            <div id="progress" class="text-lg font-medium text-gray-700">Question 1 of 120</div>
+            <div id="section-label" class="text-lg font-medium text-gray-700">Multiple Choice</div>
         </div>
 
         <!-- Question Area -->
@@ -62,7 +58,7 @@
             <h2 id="question-text" class="text-2xl font-semibold mb-4 text-gray-800"></h2>
             <div id="options-container" class="grid grid-cols-1 gap-4"></div>
         </div>
-        <button id="next-btn" class="w-full sm:w-auto px-6 py-3 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105">Next</button>
+        <button id="next-btn" class="w-full px-6 py-3 bg-indigo-600 text-white font-semibold rounded-full shadow-lg hover:bg-indigo-700 transition duration-300 transform hover:scale-105">Next</button>
     </div>
 
     <!-- Results Screen -->
@@ -70,7 +66,9 @@
         <h2 class="text-3xl font-bold mb-4 text-center text-gray-800">Quiz Complete!</h2>
         <div class="text-center mb-6">
             <p class="text-2xl font-medium text-gray-700">Your Score:</p>
-            <p id="score-display" class="text-5xl font-bold text-indigo-600 mt-2">0 / 90</p>
+            <p id="score-display" class="text-5xl font-bold text-indigo-600 mt-2">0 / 120</p>
+            <p class="text-2xl font-medium text-gray-700 mt-4">Your Grade:</p>
+            <p id="grade-display" class="text-4xl font-bold text-indigo-600 mt-2">G</p>
         </div>
         <div id="incorrect-answers" class="space-y-6">
             <h3 class="text-xl font-bold border-b pb-2 text-gray-800">Incorrect Answers:</h3>
@@ -81,102 +79,132 @@
 </div>
 
 <script>
-    const questions = {
+    const allQuestions = {
         mc: [
-            { id: 1, question: "What is the correct file extension for Python files?", options: ["A. .pyth", "B. .pt", "C. .py", "D. .pyl"], answer: "C" },
-            { id: 2, question: "Which of the following is an immutable data type in Python?", options: ["A. list", "B. dict", "C. tuple", "D. set"], answer: "C" },
-            { id: 3, question: "What is the output of `print(type(10.5))`?", options: ["A. <class 'int'>", "B. <class 'float'>", "C. <class 'str'>", "D. <class 'decimal'>"], answer: "B" },
-            { id: 4, question: "Which keyword is used to define a function in Python?", options: ["A. func", "B. def", "C. define", "D. function"], answer: "B" },
-            { id: 5, question: "Which operator is used for exponentiation?", options: ["A. **", "B. ^", "C. %", "D. //"], answer: "A" },
-            { id: 6, question: "What is the output of `print(10 // 3)`?", options: ["A. 3.33", "B. 3", "C. 1", "D. 4"], answer: "B" },
-            { id: 7, question: "Which of these is not a valid variable name in Python?", options: ["A. my_var", "B. _my_var", "C. 2my_var", "D. myVar"], answer: "C" },
-            { id: 8, question: "How do you create a multiline string?", options: ["A. 'hello' + 'world'", "B. \"\"\"hello world\"\"\"", "C. `hello world`", "D. // hello world"], answer: "B" },
-            { id: 9, question: "What is the purpose of the `len()` function?", options: ["A. To check if a variable is empty", "B. To find the length of a string, list, or tuple", "C. To convert a value to a boolean", "D. To count the number of characters in a string"], answer: "B" },
-            { id: 10, question: "Which statement is used to exit a loop?", options: ["A. exit", "B. stop", "C. break", "D. continue"], answer: "C" },
-            { id: 11, question: "What is the output of `print(list(range(5)))`?", options: ["A. [0, 1, 2, 3, 4]", "B. [1, 2, 3, 4, 5]", "C. (0, 1, 2, 3, 4)", "D. [0, 1, 2, 3, 4, 5]"], answer: "A" },
-            { id: 12, question: "What is a dictionary?", options: ["A. An ordered collection of items", "B. An unordered collection of unique items", "C. A collection of key-value pairs", "D. A fixed-size array"], answer: "C" },
-            { id: 13, question: "Which of these is used for a single-line comment in Python?", options: ["A. //", "B. /* */", "C. #", "D. <!-- -->"], answer: "C" },
-            { id: 14, question: "What does the `elif` keyword stand for?", options: ["A. else if", "B. extra if", "C. else forever", "D. end if"], answer: "A" },
-            { id: 15, question: "What is the purpose of the `pass` statement?", options: ["A. To skip to the next iteration of a loop", "B. To define an empty code block", "C. To pass a value to a function", "D. To raise an exception"], answer: "B" },
-            { id: 16, question: "What is the output of `print('hello' + ' ' + 'world')`?", options: ["A. 'hello' 'world'", "B. 'hello' + ' ' + 'world'", "C. helloworld", "D. hello world"], answer: "D" },
-            { id: 17, question: "Which loop is used to iterate over a sequence?", options: ["A. for loop", "B. until loop", "C. do-while loop", "D. repeat loop"], answer: "A" },
-            { id: 18, question: "What is a tuple?", options: ["A. An immutable list", "B. A mutable list", "C. An unordered collection", "D. A collection of key-value pairs"], answer: "A" },
-            { id: 19, question: "What does the `in` operator check for?", options: ["A. If a value is a number", "B. If a value is a string", "C. If a value exists within a sequence", "D. If a variable has been initialized"], answer: "C" },
-            { id: 20, question: "Which function is used to read input from the user?", options: ["A. get_input()", "B. read()", "C. input()", "D. read_line()"], answer: "C" },
-            { id: 21, question: "What is the default value of a function parameter if not provided?", options: ["A. None", "B. 0", "C. ''", "D. False"], answer: "A" },
-            { id: 22, question: "How do you access the value 'orange' in `fruits = ['apple', 'banana', 'orange']`?", options: ["A. fruits(2)", "B. fruits[2]", "C. fruits{2}", "D. fruits.get('orange')"], answer: "B" },
-            { id: 23, question: "Which of these is a valid way to create a set?", options: ["A. `my_set = [1, 2, 3]`", "B. `my_set = {1, 2, 3}`", "C. `my_set = (1, 2, 3)`", "D. `my_set = set.new(1, 2, 3)`"], answer: "B" },
-            { id: 24, question: "What is the result of `10 % 3`?", options: ["A. 1", "B. 3", "C. 0", "D. 3.33"], answer: "A" },
-            { id: 25, question: "Which of the following is a mutable data type?", options: ["A. tuple", "B. string", "C. int", "D. list"], answer: "D" },
-            { id: 26, question: "What is the output of `print('Python'[1])`?", options: ["A. P", "B. y", "C. t", "D. h"], answer: "B" },
-            { id: 27, question: "Which control flow statement is used for decision making?", options: ["A. for", "B. while", "C. if", "D. try"], answer: "C" },
-            { id: 28, question: "How do you add a new item to a list?", options: ["A. list.add()", "B. list.append()", "C. list.insert_end()", "D. list.push()"], answer: "B" },
-            { id: 29, question: "What does `x += 5` mean?", options: ["A. x equals x minus 5", "B. x equals x multiplied by 5", "C. x equals x plus 5", "D. x equals 5"], answer: "C" },
-            { id: 30, question: "What does the `return` keyword do in a function?", options: ["A. It prints a value to the console", "B. It stops the function execution", "C. It sends a value back from the function", "D. It defines a variable"], answer: "C" },
+            { id: 1, question: "What is the correct syntax to create a dictionary in Python?", options: ["A. `dict = {key: value}`", "B. `dict = (key: value)`", "C. `dict = [key: value]`", "D. `dict = {key = value}`"], answer: "A" },
+            { id: 2, question: "Given a list `fruits = ['apple', 'banana', 'cherry']`, what will `fruits[1]` return?", options: ["A. 'apple'", "B. 'banana'", "C. 'cherry'", "D. Error"], answer: "B" },
+            { id: 3, question: "Which of the following is used to handle exceptions in Python?", options: ["A. `catch...finally`", "B. `try...catch`", "C. `error...handle`", "D. `try...except`"], answer: "D" },
+            { id: 4, question: "What does the `pass` statement do?", options: ["A. Exits a loop", "B. Skips the current iteration", "C. Is a null operation, nothing happens", "D. Defines a new function"], answer: "C" },
+            { id: 5, question: "How do you create a function in Python?", options: ["A. `create my_function():`", "B. `def my_function():`", "C. `function my_function():`", "D. `func my_function():`"], answer: "B" },
+            { id: 6, question: "What is the output of `print(type([]))`?", options: ["A. `<class 'list'>`", "B. `<class 'array'>`", "C. `<class 'tuple'>`", "D. `<class 'object'>`"], answer: "A" },
+            { id: 7, question: "Which operator is used for exponentiation?", options: ["A. `^`", "B. `**`", "C. `%`", "D. `//`"], answer: "B" },
+            { id: 8, question: "What is the purpose of the `elif` keyword?", options: ["A. To handle exceptions", "B. To start a new loop", "C. To check another condition if the previous one was false", "D. To define a constant variable"], answer: "C" },
+            { id: 9, question: "What does `x = 5; x += 3;` result in?", options: ["A. 5", "B. 3", "C. 8", "D. 15"], answer: "C" },
+            { id: 10, question: "Which of the following is a mutable data type?", options: ["A. String", "B. Tuple", "C. Integer", "D. List"], answer: "D" },
+            { id: 11, question: "How do you add an element to a set?", options: ["A. `set.add(item)`", "B. `set.append(item)`", "C. `set.insert(item)`", "D. `set.push(item)`"], answer: "A" },
+            { id: 12, question: "What is the output of `print('hello'[1])`?", options: ["A. h", "B. e", "C. l", "D. o"], answer: "B" },
+            { id: 13, question: "Which of the following loops is ideal for iterating through a sequence?", options: ["A. `while` loop", "B. `do-while` loop", "C. `for` loop", "D. `repeat` loop"], answer: "C" },
+            { id: 14, question: "What does the `in` keyword do?", options: ["A. Checks if an item is a number", "B. Checks if an item exists in a sequence", "C. Converts an item to an integer", "D. Defines a new variable"], answer: "B" },
+            { id: 15, question: "What is a docstring?", options: ["A. A comment for a single line", "B. A multiline comment", "C. A string literal to document a module, function, or class", "D. An error message"], answer: "C" },
+            { id: 16, question: "What is the purpose of a constructor in a class?", options: ["A. To delete an object", "B. To define the object's methods", "C. To initialize the object's state", "D. To create a new class"], answer: "C" },
+            { id: 17, question: "How can you get the length of a string `s`?", options: ["A. `s.length()`", "B. `length(s)`", "C. `len(s)`", "D. `s.size()`"], answer: "C" },
+            { id: 18, question: "What is the output of `print(10 / 2)`?", options: ["A. 5", "B. 5.0", "C. 2", "D. 10"], answer: "B" },
+            { id: 19, question: "Which of the following statements is used to exit from a function?", options: ["A. `break`", "B. `continue`", "C. `exit`", "D. `return`"], answer: "D" },
+            { id: 20, question: "What is a `TypeError`?", options: ["A. An error when trying to divide by zero", "B. An error when a variable is not defined", "C. An error for invalid operation on a data type", "D. An error due to incorrect indentation"], answer: "C" },
+            { id: 21, question: "How do you define a constant in Python?", options: ["A. `const MY_CONSTANT = 10`", "B. `MY_CONSTANT = 10` (by convention)", "C. `define MY_CONSTANT 10`", "D. Python does not support constants"], answer: "B" },
+            { id: 22, question: "What is the purpose of `pip`?", options: ["A. Python's default IDE", "B. A package installer for Python", "C. A Python code formatter", "D. Python's standard library"], answer: "B" },
+            { id: 23, question: "What is the output of `print(3 * 'ab')`?", options: ["A. `ababab`", "B. `ab3`", "C. `ab ab ab`", "D. Error"], answer: "A" },
+            { id: 24, question: "Which of the following is a valid way to write a single-line comment?", options: ["A. `// This is a comment`", "B. `<!-- This is a comment -->`", "C. `# This is a comment`", "D. `/* This is a comment */`"], answer: "C" },
+            { id: 25, question: "What is the difference between `list.append()` and `list.extend()`?", options: ["A. `append` adds an element, `extend` adds elements of an iterable", "B. `append` adds multiple elements, `extend` adds one", "C. They are identical", "D. `append` is for strings, `extend` is for lists"], answer: "A" },
+            { id: 26, question: "What is `__init__` method in a class?", options: ["A. A method to initialize a new object", "B. A method to define a new class", "C. A method to delete an object", "D. A method to import modules"], answer: "A" },
+            { id: 27, question: "What is a global variable?", options: ["A. A variable only accessible inside a function", "B. A variable accessible from anywhere in the program", "C. A variable used to store an error", "D. A variable used for loops"], answer: "B" },
+            { id: 28, question: "Which of these is not a built-in Python data type?", options: ["A. `array`", "B. `list`", "C. `tuple`", "D. `dict`"], answer: "A" },
+            { id: 29, question: "What is the output of `print(10 > 5 and 5 < 10)`?", options: ["A. `True`", "B. `False`", "C. `None`", "D. `Error`"], answer: "A" },
+            { id: 30, question: "How do you import a module named `math`?", options: ["A. `use math`", "B. `include math`", "C. `import math`", "D. `get math`"], answer: "C" },
+            { id: 31, question: "What is `len('Python')`?", options: ["A. 6", "B. 7", "C. 5", "D. Error"], answer: "A" },
+            { id: 32, question: "What is a `tuple`?", options: ["A. A mutable sequence", "B. An immutable sequence", "C. A collection of key-value pairs", "D. An unordered collection of unique elements"], answer: "B" },
+            { id: 33, question: "What is the result of `3 % 2`?", options: ["A. 1", "B. 1.5", "C. 0", "D. 2"], answer: "A" },
+            { id: 34, question: "Which function converts a value to an integer?", options: ["A. `int()`", "B. `str()`", "C. `float()`", "D. `list()`"], answer: "A" },
+            { id: 35, question: "What is the purpose of `try...except` block?", options: ["A. To define a new function", "B. To handle syntax errors", "C. To catch and handle runtime errors", "D. To iterate over a list"], answer: "C" },
+            { id: 36, question: "How do you access a value in a dictionary?", options: ["A. `my_dict[key]`", "B. `my_dict.key`", "C. `my_dict->key`", "D. `my_dict(key)`"], answer: "A" },
+            { id: 37, question: "What is the correct way to call a function named `my_func`?", options: ["A. `call my_func`", "B. `my_func()`", "C. `my_func`", "D. `execute my_func`"], answer: "B" },
+            { id: 38, question: "What is the output of `print(5 == '5')`?", options: ["A. `True`", "B. `False`", "C. `Error`", "D. `None`"], answer: "B" },
+            { id: 39, question: "Which of the following is not a valid comparison operator?", options: ["A. `>`", "B. `is`", "C. `!=`", "D. `~`"], answer: "D" },
+            { id: 40, question: "What does the `break` statement do?", options: ["A. Ends the function", "B. Skips the current iteration of a loop", "C. Terminates the current loop", "D. Starts a new loop"], answer: "C" },
+            { id: 41, question: "How do you check if a variable `x` is of type integer?", options: ["A. `type(x) == 'int'`", "B. `isinstance(x, int)`", "C. `typeof(x) == 'int'`", "D. `x.is_int()`"], answer: "B" },
+            { id: 42, question: "What is a class in Python?", options: ["A. A function that returns a value", "B. A blueprint for creating objects", "C. A data structure that stores unique elements", "D. A file that contains Python code"], answer: "B" },
+            { id: 43, question: "What is the correct way to declare a function with a default parameter value?", options: ["A. `def my_func(a=10):`", "B. `def my_func(a=default 10):`", "C. `def my_func(a):`", "D. `def my_func(a = def 10):`"], answer: "A" },
+            { id: 44, question: "What is the output of `print(bool(0))`?", options: ["A. `True`", "B. `False`", "C. `None`", "D. `0`"], answer: "B" },
+            { id: 45, question: "What does `return` do inside a function?", options: ["A. Stops the function's execution and returns a value", "B. Restarts the function from the beginning", "C. Prints a message to the console", "D. Defines a new variable"], answer: "A" }
         ],
         tf: [
-            { id: 31, statement: "Python is a compiled language.", answer: "False" },
-            { id: 32, statement: "The `print()` function is used to display output.", answer: "True" },
-            { id: 33, statement: "A `list` is a mutable sequence.", answer: "True" },
-            { id: 34, statement: "The `range()` function generates a sequence of numbers.", answer: "True" },
-            { id: 35, statement: "Indentation is not important in Python.", answer: "False" },
-            { id: 36, statement: "The `and` and `or` operators are used for logical operations.", answer: "True" },
-            { id: 37, statement: "A `dictionary` uses square brackets to access its elements.", answer: "False" },
-            { id: 38, statement: "A `while` loop continues as long as its condition is false.", answer: "False" },
-            { id: 39, statement: "You can change the value of an item in a tuple.", answer: "False" },
-            { id: 40, statement: "The `//` operator performs float division.", answer: "False" },
-            { id: 41, statement: "You can convert a string to an integer using `int()`.", answer: "True" },
-            { id: 42, statement: "The `continue` statement is used to end a loop.", answer: "False" },
-            { id: 43, statement: "The `def` keyword is used to define a class.", answer: "False" },
-            { id: 44, statement: "A string in Python is an immutable sequence of characters.", answer: "True" },
-            { id: 45, statement: "Python uses curly braces `{}` to define a list.", answer: "False" },
-            { id: 46, statement: "You can have an `else` block without an `if` block.", answer: "False" },
-            { id: 47, statement: "A `set` cannot contain duplicate items.", answer: "True" },
-            { id: 48, statement: "The `is` operator checks for value equality.", answer: "False" },
-            { id: 49, statement: "A `for` loop is ideal for iterating a specific number of times.", answer: "True" },
-            { id: 50, statement: "The `pass` statement is a no-operation statement.", answer: "True" },
-            { id: 51, statement: "The `input()` function returns a string value.", answer: "True" },
-            { id: 52, statement: "The `type()` function is used to convert data types.", answer: "False" },
-            { id: 53, statement: "A function can have multiple `return` statements.", answer: "True" },
-            { id: 54, statement: "The `%` operator is used for the modulus operation.", answer: "True" },
-            { id: 55, statement: "In a `while` loop, the condition is checked at the end of the loop.", answer: "False" },
-            { id: 56, statement: "A list can contain elements of different data types.", answer: "True" },
-            { id: 57, statement: "The `del` keyword is used to delete an object.", answer: "True" },
-            { id: 58, statement: "Python does not support multiple assignment.", answer: "False" },
-            { id: 59, statement: "The `**` operator is for logical AND.", answer: "False" },
-            { id: 60, statement: "Functions must always return a value.", answer: "False" },
+            { id: 46, statement: "Python is a case-sensitive language.", answer: "True" },
+            { id: 47, statement: "`list` is a mutable data type.", answer: "True" },
+            { id: 48, statement: "The `range()` function is used to create a sequence of integers.", answer: "True" },
+            { id: 49, statement: "The `+` operator can be used to concatenate a string and an integer.", answer: "False" },
+            { id: 50, statement: "Indentation is not a requirement for Python syntax.", answer: "False" },
+            { id: 51, statement: "You can change the items in a tuple after it's created.", answer: "False" },
+            { id: 52, statement: "The `//` operator performs float division.", answer: "False" },
+            { id: 53, statement: "A `dictionary` is an ordered collection of items.", answer: "False" },
+            { id: 54, statement: "The `continue` statement skips the rest of the code inside the loop for the current iteration and moves to the next one.", answer: "True" },
+            { id: 55, statement: "You can define an `else` block without an `if` statement.", answer: "False" },
+            { id: 56, statement: "A `set` cannot contain duplicate items.", answer: "True" },
+            { id: 57, statement: "The `is` operator checks for identity (same object in memory).", answer: "True" },
+            { id: 58, statement: "A function must always return a value.", answer: "False" },
+            { id: 59, statement: "The `input()` function returns a value of type `str`.", answer: "True" },
+            { id: 60, statement: "`try`, `except`, and `finally` are used to handle exceptions.", answer: "True" },
+            { id: 61, statement: "A string in Python is an immutable sequence of characters.", answer: "True" },
+            { id: 62, statement: "`NameError` is raised when a variable is not defined.", answer: "True" },
+            { id: 63, statement: "You can use a `for` loop to iterate through a dictionary's keys.", answer: "True" },
+            { id: 64, statement: "The `pass` statement is essential for functions that return no value.", answer: "False" },
+            { id: 65, statement: "Python is a dynamically typed language.", answer: "True" },
+            { id: 66, statement: "The `del` keyword can be used to remove items from a list.", answer: "True" },
+            { id: 67, statement: "The `range(5)` function generates numbers from 1 to 5.", answer: "False" },
+            { id: 68, statement: "A function can have multiple `return` statements.", answer: "True" },
+            { id: 69, statement: "The `%` operator returns the remainder of a division.", answer: "True" },
+            { id: 70, statement: "The `str()` function is used to convert a number to a string.", answer: "True" },
+            { id: 71, statement: "The `and` operator returns `True` if at least one condition is true.", answer: "False" },
+            { id: 72, statement: "A `while` loop checks its condition at the end of the loop.", answer: "False" },
+            { id: 73, statement: "The `import` statement is used to bring modules into a program.", answer: "True" },
+            { id: 74, statement: "A class in Python is a blueprint for creating objects.", answer: "True" },
+            { id: 75, statement: "Method overloading is a concept where multiple methods have the same name but different parameters.", answer: "True" },
+            { id: 76, statement: "Inheritance allows a new class to inherit properties from an existing class.", answer: "True" },
+            { id: 77, statement: "A `ValueError` is raised when a function receives an argument of the correct type but an inappropriate value.", answer: "True" },
+            { id: 78, statement: "The `+` operator for lists creates a new list by concatenating two lists.", answer: "True" },
+            { id: 79, statement: "The `sorted()` function sorts a list in-place and returns `None`.", answer: "False" },
+            { id: 80, statement: "A `for` loop is considered more robust and readable than a `while` loop for simple iterations.", answer: "True" },
+            { id: 81, statement: "A `global` keyword is needed to modify a global variable inside a function.", answer: "True" },
+            { id: 82, statement: "Python is a compiled language.", answer: "False" },
+            { id: 83, statement: "You can access elements of a dictionary using their index.", answer: "False" },
+            { id: 84, statement: "An object is an instance of a class.", answer: "True" },
+            { id: 85, statement: "Polymorphism allows objects of different classes to be treated as objects of a common superclass.", answer: "True" },
+            { id: 86, statement: "A `try` block must be followed by at least one `except` or `finally` block.", answer: "True" },
+            { id: 87, statement: "The `f-string` is a way to format strings using expressions.", answer: "True" },
+            { id: 88, statement: "Python's standard library is a small collection of essential modules.", answer: "False" },
+            { id: 89, statement: "A `list` can contain elements of different data types.", answer: "True" },
+            { id: 90, statement: "The `finally` block of a `try...except` statement is always executed, even if an exception occurs.", answer: "True" }
         ],
         matching: [
-            { id: 61, term: "List", matchId: "C" },
-            { id: 62, term: "Tuple", matchId: "B" },
-            { id: 63, term: "Dictionary", matchId: "A" },
-            { id: 64, term: "`if`/`elif`/`else`", matchId: "D" },
-            { id: 65, term: "`for` loop", matchId: "G" },
-            { id: 66, term: "`while` loop", matchId: "I" },
-            { id: 67, term: "Function", matchId: "F" },
-            { id: 68, term: "`def`", matchId: "E" },
-            { id: 69, term: "`return`", matchId: "H" },
-            { id: 70, term: "Modulus operator", matchId: "K" },
-            { id: 71, term: "Floor division", matchId: "J" },
-            { id: 72, term: "String slicing", matchId: "N" },
-            { id: 73, term: "`append()`", matchId: "L" },
-            { id: 74, term: "`pop()`", matchId: "M" },
-            { id: 75, term: "`len()`", matchId: "P" },
-            { id: 76, term: "`in` operator", matchId: "Q" },
-            { id: 77, term: "Boolean", matchId: "O" },
-            { id: 78, term: "Float", matchId: "S" },
-            { id: 79, term: "Integer", matchId: "R" },
-            { id: 80, term: "`continue`", matchId: "U" },
-            { id: 81, term: "`break`", matchId: "T" },
-            { id: 82, term: "`pass`", matchId: "V" },
-            { id: 83, term: "`input()`", matchId: "W" },
-            { id: 84, term: "Set", matchId: "Y" },
-            { id: 85, term: "Key-value pair", matchId: "X" },
-            { id: 86, term: "Identity operator", matchId: "Z" },
-            { id: 87, term: "Logical operator", matchId: "AA" },
-            { id: 88, term: "Comparison operator", matchId: "AB" },
-            { id: 89, term: "F-string", matchId: "AC" },
-            { id: 90, term: "`range()`", matchId: "AD" },
+            { id: 91, term: "List", matchId: "C" },
+            { id: 92, term: "Tuple", matchId: "B" },
+            { id: 93, term: "Dictionary", matchId: "A" },
+            { id: 94, term: "`if`/`elif`/`else`", matchId: "D" },
+            { id: 95, term: "`for` loop", matchId: "G" },
+            { id: 96, term: "`while` loop", matchId: "I" },
+            { id: 97, term: "Function", matchId: "F" },
+            { id: 98, term: "`def`", matchId: "E" },
+            { id: 99, term: "`return`", matchId: "H" },
+            { id: 100, term: "Modulus operator", matchId: "K" },
+            { id: 101, term: "Floor division", matchId: "J" },
+            { id: 102, term: "String slicing", matchId: "N" },
+            { id: 103, term: "`append()`", matchId: "L" },
+            { id: 104, term: "`pop()`", matchId: "M" },
+            { id: 105, term: "`len()`", matchId: "P" },
+            { id: 106, term: "`in` operator", matchId: "Q" },
+            { id: 107, term: "Boolean", matchId: "O" },
+            { id: 108, term: "Float", matchId: "S" },
+            { id: 109, term: "Integer", matchId: "R" },
+            { id: 110, term: "`continue`", matchId: "U" },
+            { id: 111, term: "`break`", matchId: "T" },
+            { id: 112, term: "`pass`", matchId: "V" },
+            { id: 113, term: "`input()`", matchId: "W" },
+            { id: 114, term: "Set", matchId: "Y" },
+            { id: 115, term: "Key-value pair", matchId: "X" },
+            { id: 116, term: "Identity operator", matchId: "Z" },
+            { id: 117, term: "Logical operator", matchId: "AA" },
+            { id: 118, term: "Comparison operator", matchId: "AB" },
+            { id: 119, term: "F-string", matchId: "AC" },
+            { id: 120, term: "`range()`", matchId: "AD" },
         ],
         matchingAnswers: [
             { id: "A", text: "Mutable collection of key-value pairs" },
@@ -212,23 +240,27 @@
         ]
     };
 
-    let allQuestions = [...questions.mc, ...questions.tf, ...questions.matching];
+    let questions = [
+        ...allQuestions.mc,
+        ...allQuestions.tf,
+        ...allQuestions.matching
+    ];
+
     let currentQuestionIndex = 0;
     let score = 0;
     let userAnswers = [];
-    let timeLeft = 90 * 60; // 90 minutes in seconds
-    let timerInterval;
 
     const startScreen = document.getElementById('start-screen');
     const quizScreen = document.getElementById('quiz-screen');
     const resultsScreen = document.getElementById('results-screen');
     const startBtn = document.getElementById('start-btn');
     const nextBtn = document.getElementById('next-btn');
-    const timerDisplay = document.getElementById('timer');
     const progressDisplay = document.getElementById('progress');
+    const sectionLabel = document.getElementById('section-label');
     const questionText = document.getElementById('question-text');
     const optionsContainer = document.getElementById('options-container');
     const scoreDisplay = document.getElementById('score-display');
+    const gradeDisplay = document.getElementById('grade-display');
     const incorrectAnswersList = document.getElementById('incorrect-answers');
 
     startBtn.addEventListener('click', startQuiz);
@@ -240,247 +272,147 @@
             startScreen.classList.add('hidden');
             quizScreen.classList.remove('hidden');
             quizScreen.classList.add('opacity-100');
-            startTimer();
             loadQuestion();
         }, 500);
     }
 
-    function startTimer() {
-        timerInterval = setInterval(() => {
-            timeLeft--;
-            const minutes = Math.floor(timeLeft / 60);
-            const seconds = timeLeft % 60;
-            timerDisplay.textContent = `Time Left: ${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
-            if (timeLeft <= 300) { // 5 minutes left
-                timerDisplay.classList.add('timer-red');
-            }
-            if (timeLeft <= 0) {
-                clearInterval(timerInterval);
-                submitQuiz();
-            }
-        }, 1000);
-    }
-
     function loadQuestion() {
-        if (currentQuestionIndex >= allQuestions.length) {
+        if (currentQuestionIndex >= questions.length) {
             submitQuiz();
             return;
         }
 
-        const currentQuestion = allQuestions[currentQuestionIndex];
-        progressDisplay.textContent = `Question ${currentQuestion.id} of 90`;
+        const currentQuestion = questions[currentQuestionIndex];
+        progressDisplay.textContent = `Question ${currentQuestion.id} of 120`;
         optionsContainer.innerHTML = '';
         nextBtn.disabled = true;
 
-        if (currentQuestion.id <= 30) {
+        if (currentQuestion.id <= 45) {
+            sectionLabel.textContent = "Multiple Choice";
             // Multiple Choice
             questionText.textContent = `${currentQuestion.id}. ${currentQuestion.question}`;
-            optionsContainer.classList.remove('grid-cols-2', 'gap-8');
-            optionsContainer.classList.add('grid-cols-1', 'gap-4');
+            optionsContainer.classList.remove('grid-cols-1', 'gap-4');
+            optionsContainer.classList.add('grid-cols-2', 'gap-8');
             currentQuestion.options.forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
                 button.className = 'w-full text-left py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-gray-50 hover:bg-gray-200 transition duration-150 ease-in-out';
                 button.addEventListener('click', () => {
-                    selectAnswer(option);
+                    selectAnswer(button, option);
                     nextBtn.disabled = false;
                 });
                 optionsContainer.appendChild(button);
             });
-        } else if (currentQuestion.id <= 60) {
+        } else if (currentQuestion.id <= 90) {
+            sectionLabel.textContent = "True / False";
             // True/False
             questionText.textContent = `${currentQuestion.id}. ${currentQuestion.statement}`;
-            optionsContainer.classList.remove('grid-cols-1', 'gap-4');
+            optionsContainer.classList.remove('grid-cols-2', 'gap-8');
             optionsContainer.classList.add('grid-cols-2', 'gap-8');
             ['True', 'False'].forEach(option => {
                 const button = document.createElement('button');
                 button.textContent = option;
                 button.className = 'w-full py-3 px-4 border border-gray-300 rounded-lg shadow-sm bg-gray-50 hover:bg-gray-200 transition duration-150 ease-in-out';
                 button.addEventListener('click', () => {
-                    selectAnswer(option);
+                    selectAnswer(button, option);
                     nextBtn.disabled = false;
                 });
                 optionsContainer.appendChild(button);
             });
         } else {
+            sectionLabel.textContent = "Matching Type";
             // Matching Type
-            const matchingTerms = questions.matching;
-            const matchingAnswers = questions.matchingAnswers;
-            const shuffledAnswers = [...matchingAnswers].sort(() => Math.random() - 0.5);
+            questionText.textContent = `${currentQuestion.id}. ${currentQuestion.term}`;
+            optionsContainer.classList.remove('grid-cols-2', 'gap-8');
+            optionsContainer.classList.add('grid-cols-1', 'gap-4');
 
-            questionText.textContent = "Matching Type: Match the term with its correct description.";
-            optionsContainer.classList.remove('grid-cols-1', 'gap-4');
-            optionsContainer.classList.add('grid-cols-2', 'gap-8');
+            const select = document.createElement('select');
+            select.className = 'w-full p-3 border border-gray-300 rounded-lg shadow-sm focus:ring-indigo-500 focus:border-indigo-500';
+            select.innerHTML = '<option value="" disabled selected>Select a matching answer</option>';
 
-            const termsColumn = document.createElement('div');
-            const answersColumn = document.createElement('div');
-            termsColumn.className = 'space-y-4';
-            answersColumn.className = 'space-y-4';
-
-            matchingTerms.forEach(termItem => {
-                const termDiv = document.createElement('div');
-                termDiv.className = 'py-2 px-4 border border-gray-300 rounded-lg bg-gray-50';
-                termDiv.textContent = `${termItem.id}. ${termItem.term}`;
-                termsColumn.appendChild(termDiv);
+            const shuffledAnswers = [...allQuestions.matchingAnswers].sort(() => Math.random() - 0.5);
+            shuffledAnswers.forEach(match => {
+                const option = document.createElement('option');
+                option.value = match.id;
+                option.textContent = `${match.id}. ${match.text}`;
+                select.appendChild(option);
             });
 
-            shuffledAnswers.forEach(answerItem => {
-                const answerDiv = document.createElement('div');
-                answerDiv.textContent = `${answerItem.id}. ${answerItem.text}`;
-                answerDiv.className = 'py-2 px-4 border border-gray-300 rounded-lg shadow-sm bg-gray-50 matching-choice';
-                answerDiv.dataset.id = answerItem.id;
-                answerDiv.addEventListener('click', () => {
-                    const selected = optionsContainer.querySelector('.matching-choice.selected');
-                    if (selected) {
-                        selected.classList.remove('selected');
-                    }
-                    answerDiv.classList.add('selected');
-                    nextBtn.disabled = false;
-                });
-                answersColumn.appendChild(answerDiv);
+            select.addEventListener('change', (e) => {
+                questions[currentQuestionIndex].userAnswer = e.target.value;
+                nextBtn.disabled = false;
             });
-
-            optionsContainer.appendChild(termsColumn);
-            optionsContainer.appendChild(answersColumn);
-            // Matching question is the last one in the sequence and handles its own user input
-            nextBtn.disabled = false;
+            optionsContainer.appendChild(select);
         }
     }
 
-    function selectAnswer(selected) {
-        optionsContainer.querySelectorAll('button').forEach(button => {
-            button.classList.remove('bg-gray-200');
-            button.classList.add('bg-gray-50');
+    function selectAnswer(button, selected) {
+        optionsContainer.querySelectorAll('button').forEach(btn => {
+            btn.classList.remove('bg-gray-200');
+            btn.classList.add('bg-gray-50');
         });
-        const selectedBtn = Array.from(optionsContainer.querySelectorAll('button')).find(btn => btn.textContent === selected);
-        if (selectedBtn) {
-             selectedBtn.classList.remove('bg-gray-50');
-             selectedBtn.classList.add('bg-gray-200');
-        }
-        allQuestions[currentQuestionIndex].userAnswer = selected;
+        button.classList.remove('bg-gray-50');
+        button.classList.add('bg-gray-200');
+        questions[currentQuestionIndex].userAnswer = selected;
     }
 
     function nextQuestion() {
-        const currentQuestion = allQuestions[currentQuestionIndex];
+        const currentQuestion = questions[currentQuestionIndex];
         let isCorrect = false;
 
-        if (currentQuestion.id <= 60) {
+        if (currentQuestion.id <= 90) {
             // MC and T/F
             if (currentQuestion.userAnswer && currentQuestion.userAnswer.includes(currentQuestion.answer)) {
-                isCorrect = true;
                 score++;
+                isCorrect = true;
             }
         } else {
-            // Matching type - check all answers at once
-            const matchingQuestions = questions.matching;
-            const matchingAnswers = questions.matchingAnswers;
-            let correctCount = 0;
-            const selectedPairs = {};
-            const userChoices = optionsContainer.querySelectorAll('.matching-choice');
-
-            userChoices.forEach(choice => {
-                if (choice.classList.contains('selected')) {
-                    const termId = questions.matching[currentQuestionIndex - 60].id;
-                    selectedPairs[termId] = choice.dataset.id;
-                }
-            });
-
-            // For simplicity, we assume matching is all or nothing. The user must get all 30 correct to score.
-            // A more complex implementation could check individual pairs.
-            // For this quiz, we'll check all 30 at the end. The 'Next' button only serves to progress.
+            // Matching
+            if (currentQuestion.userAnswer && currentQuestion.userAnswer.includes(currentQuestion.matchId)) {
+                score++;
+                isCorrect = true;
+            }
         }
 
         userAnswers.push({
             id: currentQuestion.id,
-            question: currentQuestion.question || currentQuestion.statement,
-            type: currentQuestion.id <= 30 ? 'mc' : (currentQuestion.id <= 60 ? 'tf' : 'matching'),
+            question: currentQuestion.question || currentQuestion.statement || currentQuestion.term,
+            type: currentQuestion.id <= 45 ? 'mc' : (currentQuestion.id <= 90 ? 'tf' : 'matching'),
             userAnswer: currentQuestion.userAnswer,
-            correctAnswer: currentQuestion.answer
+            correctAnswer: currentQuestion.id <= 90 ? currentQuestion.answer : currentQuestion.matchId
         });
 
         currentQuestionIndex++;
-        if (currentQuestionIndex < 60) {
-            loadQuestion();
-        } else if (currentQuestionIndex === 60) {
-            loadQuestion(); // Load the matching question area
-            nextBtn.textContent = 'Submit Quiz';
-        } else {
-            // Logic for matching answers at the end of the quiz
-            const matchingCorrectAnswers = questions.matching.reduce((acc, item) => {
-                acc[item.id] = item.matchId;
-                return acc;
-            }, {});
-
-            const userSelectedAnswers = Array.from(optionsContainer.querySelectorAll('.matching-choice')).reduce((acc, choice) => {
-                if(choice.classList.contains('selected')){
-                    acc = choice.dataset.id;
-                }
-                return acc;
-            }, null);
-
-            if(userSelectedAnswers && userSelectedAnswers === matchingCorrectAnswers[61]){ // This is a simplified check for a single matching pair.
-                // For a proper matching question, you'd need a more complex UI and check all 30.
-                // Given the one-question-per-screen rule, the matching question is a special case.
-                // The current implementation is a single "Matching Type" screen with all items.
-                // The correct logic would be to check the full match.
-            }
-            submitQuiz();
+        loadQuestion();
+        if (currentQuestionIndex === questions.length) {
+            nextBtn.textContent = 'Finish Quiz';
         }
     }
 
     function submitQuiz() {
-        clearInterval(timerInterval);
-
-        // Calculate score for MC and T/F
-        score = userAnswers.filter(q => {
-            if (q.type === 'mc' || q.type === 'tf') {
-                return q.userAnswer && q.userAnswer.includes(q.correctAnswer);
-            }
-            return false;
-        }).length;
-
-        // Calculate score for Matching Type
-        const matchingQuestions = questions.matching;
-        const matchingAnswers = Array.from(optionsContainer.querySelectorAll('.matching-choice'));
-        let matchingCorrectCount = 0;
-        
-        // This is a simplified check. A proper matching quiz UI would allow pairing items.
-        // For this implementation, we will check if the user selected any answer.
-        const userSelections = {};
-        matchingAnswers.forEach(choice => {
-            if (choice.classList.contains('selected')) {
-                // This logic is incorrect for a 1-to-1 match of 30 items
-                // A better approach would be to have user select a pair.
-                // Given the constraints, let's just mark the entire section correct or incorrect.
-                // Assuming all 30 matches are correct if the user selected the right one.
-                const termId = questions.matching[0].id; // The UI only supports one matching "question"
-                const correctAnswer = matchingQuestions[0].matchId;
-                if (choice.dataset.id === correctAnswer) {
-                    matchingCorrectCount = 30;
-                }
-            }
-        });
-        
-        // This is a simplification due to the UI constraint of one matching 'question' screen
-        score += matchingCorrectCount;
-
         quizScreen.classList.add('hidden');
         resultsScreen.classList.remove('hidden');
-        scoreDisplay.textContent = `${score} / 90`;
+        scoreDisplay.textContent = `${score} / 120`;
+
+        const grade = (score / 120) * 50 + 50;
+        gradeDisplay.textContent = grade.toFixed(2);
+
         displayIncorrectAnswers();
     }
 
     function displayIncorrectAnswers() {
         const incorrects = userAnswers.filter(q => {
+            const currentQuestion = questions.find(item => item.id === q.id);
             if (q.type === 'mc' || q.type === 'tf') {
-                return !q.userAnswer || !q.userAnswer.includes(q.correctAnswer);
+                return !q.userAnswer || !q.userAnswer.includes(currentQuestion.answer);
+            } else {
+                return !q.userAnswer || !q.userAnswer.includes(currentQuestion.matchId);
             }
-            return false;
         });
 
         if (incorrects.length === 0) {
             const p = document.createElement('p');
-            p.textContent = "Great job! You answered all questions correctly in the Multiple Choice and True/False sections.";
+            p.textContent = "Congratulations! You got all the questions right.";
             p.className = 'text-center text-green-600 font-semibold mt-4';
             incorrectAnswersList.appendChild(p);
         } else {
@@ -495,12 +427,14 @@
 
                 const yourAnswerP = document.createElement('p');
                 yourAnswerP.className = 'text-sm text-gray-700';
-                yourAnswerP.innerHTML = `<strong>Your Answer:</strong> ${q.userAnswer || 'Not answered'}`;
+                const userAnswerText = q.type === 'matching' ? allQuestions.matchingAnswers.find(item => item.id === q.userAnswer)?.text : q.userAnswer;
+                yourAnswerP.innerHTML = `<strong>Your Answer:</strong> ${userAnswerText || 'Not answered'}`;
                 div.appendChild(yourAnswerP);
 
                 const correctAnswerP = document.createElement('p');
                 correctAnswerP.className = 'text-sm text-gray-700 mt-1';
-                correctAnswerP.innerHTML = `<strong>Correct Answer:</strong> ${q.correctAnswer}`;
+                const correctAnswerText = q.type === 'matching' ? allQuestions.matchingAnswers.find(item => item.id === q.correctAnswer)?.text : q.correctAnswer;
+                correctAnswerP.innerHTML = `<strong>Correct Answer:</strong> ${correctAnswerText}`;
                 div.appendChild(correctAnswerP);
 
                 incorrectAnswersList.appendChild(div);
